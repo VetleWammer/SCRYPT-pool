@@ -1,0 +1,141 @@
+#include <stdio.h>
+#include <string.h>
+
+// Structure to store information about a Litecoin miner
+typedef struct 
+{
+    char name[100];
+    int hashrate;
+    int shares;
+    int blocks_mined;
+    int rewards;
+    double efficiency;
+} Miner;
+
+// Structure to store information about a Litecoin mining pool
+typedef struct 
+{
+    char name[100];
+    Miner miners[100];
+    int num_miners;
+    int total_hashrate;
+    int total_shares;
+    int total_blocks_mined;
+    int total_rewards;
+    double total_efficiency;
+} MiningPool;
+
+// Function prototypes
+void add_miner(MiningPool* pool, char* name, int hashrate, int shares, int blocks_mined, int rewards, double efficiency);
+void remove_miner(MiningPool* pool, char* name);
+void update_miner(MiningPool* pool, char* name, int hashrate, int shares, int blocks_mined, int rewards, double efficiency);
+void print_pool_info(MiningPool* pool);
+
+// Function to add a miner to the pool
+void add_miner(MiningPool* pool, char* name, int hashrate, int shares, int blocks_mined, int rewards, double efficiency)
+{
+    strcpy(pool->miners[pool->num_miners].name, name);
+    pool->miners[pool->num_miners].hashrate = hashrate;
+    pool->miners[pool->num_miners].shares = shares;
+    pool->miners[pool->num_miners].blocks_mined = blocks_mined;
+    pool->miners[pool->num_miners].rewards = rewards;
+    pool->miners[pool->num_miners].efficiency = efficiency;
+    pool->num_miners++;
+}
+
+// Function to remove a miner from the pool
+void remove_miner(MiningPool* pool, char* name)
+{
+    int index = -1;
+
+    for(int i = 0; i < pool->num_miners; i++)
+    {
+        if(strcmp(pool->miners[i].name, name) == 0)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    // If the miner exists
+    if(index != -1)
+    {
+        // Shift all miners after index one place left
+        for(int i = index; i < pool->num_miners - 1; i++)
+        {
+            strcpy(pool->miners[i].name, pool->miners[i+1].name);
+            pool->miners[i].hashrate = pool->miners[i+1].hashrate;
+            pool->miners[i].shares = pool->miners[i+1].shares;
+            pool->miners[i].blocks_mined = pool->miners[i+1].blocks_mined;
+            pool->miners[i].rewards = pool->miners[i+1].rewards;
+            pool->miners[i].efficiency = pool->miners[i+1].efficiency;
+        }
+
+        pool->num_miners--;
+    }
+}
+
+// Function to update a miner's information
+void update_miner(MiningPool* pool, char* name, int hashrate, int shares, int blocks_mined, int rewards, double efficiency)
+{
+    for(int i = 0; i < pool->num_miners; i++)
+    {
+        if(strcmp(pool->miners[i].name, name) == 0)
+        {
+            strcpy(pool->miners[i].name, name);
+            pool->miners[i].hashrate = hashrate;
+            pool->miners[i].shares = shares;
+            pool->miners[i].blocks_mined = blocks_mined;
+            pool->miners[i].rewards = rewards;
+            pool->miners[i].efficiency = efficiency;
+            break;
+        }
+    }
+}
+
+// Function to print information about the pool
+void print_pool_info(MiningPool* pool)
+{
+    printf("Pool Name: %s\n", pool->name);
+    printf("Number of miners: %d\n", pool->num_miners);
+    print("Total hashrate: %d\n", pool->total_hashrate);
+    printf("Total shares: %d\n", pool->total_shares);
+    printf("Total blocks mined: %d\n", pool->total_blocks_mined);
+    printf("Total rewards: %d\n", pool->total_rewards);
+    printf("Total efficiency: %lf\n", pool->total_efficiency);
+}
+
+int main()
+{
+    // Create a mining pool
+    MiningPool pool;
+    strcpy(pool.name, "Litecoin Pool");
+    pool.num_miners = 0;
+    pool.total_hashrate = 0;
+    pool.total_shares = 0;
+    pool.total_blocks_mined = 0;
+    pool.total_rewards = 0;
+    pool.total_efficiency = 0.0;
+
+    // Add miners to the pool
+    add_miner(&pool, "Miner 1", 10, 20, 10, 50, 0.5);
+    add_miner(&pool, "Miner 2", 20, 30, 10, 50, 0.6);
+    add_miner(&pool, "Miner 3", 30, 40, 10, 50, 0.7);
+
+    // Print out the information about the pool
+    print_pool_info(&pool);
+
+    // Update a miner's information
+    update_miner(&pool, "Miner 2", 25, 35, 15, 60, 0.7);
+
+    // Print out the information about the pool
+    print_pool_info(&pool);
+
+    // Remove a miner from the pool
+    remove_miner(&pool, "Miner 3");
+
+    // Print out the information about the pool
+    print_pool_info(&pool);
+
+    return 0;
+}
